@@ -19,6 +19,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
 		if tn.Sub(lastt) < 1*time.Second {
 			if counter > 20 {
+				http.Error(w, "Can not process", http.StatusTooManyRequests)
 				log.Printf("Can not process this for %v", lastt.Add(1*time.Second).Sub(tn))
 			} else {
 				possible = true
