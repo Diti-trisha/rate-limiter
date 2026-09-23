@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
@@ -14,8 +15,8 @@ var (
 func handler(w http.ResponseWriter, r *http.Request) {
 	var possible bool
 	tn := time.Now()
+	counter++
 	if r.Method == http.MethodGet {
-		counter++
 		if tn.Sub(lastt) < 1*time.Second {
 			if counter > 20 {
 				log.Printf("Can not process this for %v", lastt.Add(1*time.Second).Sub(tn))
@@ -28,9 +29,9 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			counter = 1
 		}
 	} else {
-		counter++
 		if tn.Sub(lastt) < 1*time.Second {
 			if counter > 5 {
+				http.Error(w, "Can not process", http.StatusTooManyRequests)
 				log.Printf("Can not process this for %v", lastt.Add(1*time.Second).Sub(tn))
 			} else {
 				possible = true
@@ -42,6 +43,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if possible {
+		fmt.Fprintln(w, "Processed")
 		log.Println("Processed")
 	}
 }
